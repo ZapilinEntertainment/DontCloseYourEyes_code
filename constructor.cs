@@ -14,17 +14,19 @@ public class constructor : MonoBehaviour {
 	public Material roof_material;
 	public Material floor_material;
 	public Material wall_material;
-	public GameObject wall_window_2m;
-	public GameObject wall_window_3m;
-	public GameObject wall_window_4m;
-	public GameObject wall_05m;
-	public GameObject wall_1m;
-	public GameObject wall_15m;
-	public GameObject wall_2m;
-	public GameObject wall_door_1m;
-	public GameObject wall_door_15m;
-	public GameObject wall_door_2m;
-	public GameObject floor_tile;
+	GameObject wall_window_2m;
+	GameObject wall_window_3m;
+	GameObject wall_window_4m;
+	GameObject wall_05m;
+	GameObject wall_1m;
+	GameObject wall_15m;
+	GameObject wall_2m;
+	GameObject wall_door_1m;
+	GameObject wall_door_15m;
+	GameObject wall_door_2m;
+	GameObject floor_tile;
+	GameObject door_frame;
+	GameObject window_frame;
 
 	void Awake () {
 		wall_05m=Resources.Load<GameObject>("structures/wall_0.5m");
@@ -38,6 +40,8 @@ public class constructor : MonoBehaviour {
 		wall_door_1m=Resources.Load<GameObject>("structures/wall_door_1m");
 		wall_door_15m=Resources.Load<GameObject>("structures/wall_door_1.5m");
 		wall_door_2m=Resources.Load<GameObject>("structures/wall_door_2m");
+		door_frame=Resources.Load<GameObject>("structures/door_frame");
+		window_frame=Resources.Load<GameObject>("structures/window_frame");
 	}
 
 
@@ -142,7 +146,7 @@ public class constructor : MonoBehaviour {
 
 		//основные комнаты
 		float l=0;
-		if (rooms_x>0)  {
+		if (rooms_n>0)  {
 			left=WallsDivide(rooms_y-1.5f); if (rooms_n==4) left+="dh"; else left="dh"+left;
 			if (right_open) right=WindowsDivide(rooms_y); else right="";
 			if (fwd_open) fwd=WindowsDivide(rooms_x); else fwd="";
@@ -194,6 +198,7 @@ public class constructor : MonoBehaviour {
 		if (size_y%2!=0) havehalf_y=true;
 
 		//floor&&roof
+		GameObject y=null;
 		GameObject x=Instantiate(floor_tile,transform.position,transform.rotation) as GameObject;
 		x.transform.parent=room.transform;
 		x.transform.localPosition=new Vector3(size_x/2.0f,0,size_y/2.0f);
@@ -230,6 +235,7 @@ public class constructor : MonoBehaviour {
 		else {
 			byte j=0;l=0;
 				while (j<fwd.Length) {
+				x=null;y=null;
 					bool need_rotation=false;
 					i=0;
 					switch (fwd.Substring(j,2)) {
@@ -237,26 +243,76 @@ public class constructor : MonoBehaviour {
 				case "wm":x=Instantiate(wall_1m,transform.position,transform.rotation) as GameObject;i=1;need_rotation=true;break;
 					case "wh":x=Instantiate(wall_15m,transform.position,transform.rotation) as GameObject;i=1.5f;need_rotation=true;break;
 					case "wt":x=Instantiate(wall_2m,transform.position,transform.rotation) as GameObject;i=2;break;
-					case "o2":x=Instantiate(wall_window_2m,transform.position,transform.rotation) as GameObject;i=2;break;	
-				    case "o3":x=Instantiate(wall_window_3m,transform.position,transform.rotation) as GameObject;i=3;need_rotation=true;break;
-					case "o4":x=Instantiate(wall_window_4m,transform.position,transform.rotation) as GameObject;i=4;need_rotation=true;break;
-					case "dm":x=Instantiate(wall_door_1m,transform.position,transform.rotation) as GameObject;i=1;break;
-					case "dh":x=Instantiate(wall_door_15m,transform.position,transform.rotation) as GameObject;i=1.5f;need_rotation=true;break;
-					case "ds":x=Instantiate(wall_door_2m,transform.position,transform.rotation) as GameObject;i=2;break;
+					case "o2":
+					   x=Instantiate(wall_window_2m) as GameObject;
+					   i=2;
+					   y=Instantiate(window_frame) as GameObject;
+					   y.transform.parent=room.transform;
+					   y.transform.localPosition=new Vector3(l+i/2,1.725f,size_y);
+					break;	
+				    case "o3":
+					   x=Instantiate(wall_window_3m,transform.position,transform.rotation) as GameObject;
+					   i=3;
+					   need_rotation=true;
+					   y=Instantiate(window_frame) as GameObject;
+					   y.transform.parent=room.transform;
+					   y.transform.localPosition=new Vector3(l+i/2,1.725f,size_y);
+					   y.transform.localScale=new Vector3(1.6f,1,1);
+					break;
+					case "o4":
+					   x=Instantiate(wall_window_4m,transform.position,transform.rotation) as GameObject;
+					   i=4;
+					   need_rotation=true;
+					   y=Instantiate(window_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(l+i/2,1.725f,size_y);
+					y.transform.localScale=new Vector3(2,1,1);
+					break;
+					case "dm":
+					       x=Instantiate(wall_door_1m,transform.position,transform.rotation) as GameObject;
+					       i=1;
+					       y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(l+i/2,1.25f,size_y);
+					y.transform.localScale=new Vector3(0.8f,1,1);
+					break;
+					case "dh":
+					x=Instantiate(wall_door_15m,transform.position,transform.rotation) as GameObject;
+					i=1.5f;
+					need_rotation=true;
+					y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(l+i/2,1.25f,size_y);
+					y.transform.localScale=new Vector3(1.2f,1,1);
+					break;
+					case "ds":
+					x=Instantiate(wall_door_2m,transform.position,transform.rotation) as GameObject;
+					i=2;
+					y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(l+i/2,1.25f,size_y);
+					y.transform.localScale=new Vector3(1.2f,1,1);
+					break;
 					case "e1":i=1;x=null;break;
 					case "eh": i=1.5f;x=null;break;
 					case "e2": i=2;x=null;break;
 					}
 					if (x!=null) {
 					x.transform.parent=room.transform;
-					x.transform.localPosition=new Vector3(l+i/2,1.5f,size_y);l+=i;
+					x.transform.localPosition=new Vector3(l+i/2,1.5f,size_y);
 					if (need_rotation) x.transform.localRotation=Quaternion.Euler(0,180,0);
-						x.GetComponent<Renderer>().material=wall_material;}
+						x.GetComponent<Renderer>().material=wall_material;
+					if (y!=null) {						
+						y.transform.localRotation=Quaternion.Euler(0,180,0);
+						y=null;
+					}
+					l+=i;
+				}
 					j+=2;
 				}
 		}
 		//left walls
-		i=0;
+		i=0;x=null;y=null;
 		if (left=="") {
 		while (i+2<=size_y) {
 			x=Instantiate(wall_2m,transform.position,transform.rotation) as GameObject;
@@ -276,6 +332,7 @@ public class constructor : MonoBehaviour {
 		else {
 			byte j=0;l=0;
 				while (j<left.Length) {
+				    x=null;y=null;
 					bool need_rotation=false;
 					i=0;
 					switch (left.Substring(j,2)) {
@@ -283,27 +340,77 @@ public class constructor : MonoBehaviour {
 				case "wm":x=Instantiate(wall_1m,transform.position,transform.rotation) as GameObject;i=1;need_rotation=true;break;
 					case "wh":x=Instantiate(wall_15m,transform.position,transform.rotation) as GameObject;i=1.5f;need_rotation=true;break;
 					case "wt":x=Instantiate(wall_2m,transform.position,transform.rotation) as GameObject;i=2;break;
-					case "o2":x=Instantiate(wall_window_2m,transform.position,transform.rotation) as GameObject;i=2;break;	
-				case "o3":x=Instantiate(wall_window_3m,transform.position,transform.rotation) as GameObject;i=3;need_rotation=true;break;
-					case "o4":x=Instantiate(wall_window_4m,transform.position,transform.rotation) as GameObject;i=4;need_rotation=true;break;
-					case "dm":x=Instantiate(wall_door_1m,transform.position,transform.rotation) as GameObject;i=1;break;
-					case "dh":x=Instantiate(wall_door_15m,transform.position,transform.rotation) as GameObject;i=1.5f;need_rotation=true;break;
-					case "ds":x=Instantiate(wall_door_2m,transform.position,transform.rotation) as GameObject;i=2;need_rotation=true;break;
-					case "e1":i=1;x=null;break;
-					case "eh": i=1.5f;x=null;break;
-					case "e2": i=2;x=null;break;
+					case "o2":
+					x=Instantiate(wall_window_2m,transform.position,transform.rotation) as GameObject;
+					i=2;
+					y=Instantiate(window_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(0,1.5f,size_y-l-i/2);
+					break;	
+				case "o3":
+					x=Instantiate(wall_window_3m,transform.position,transform.rotation) as GameObject;
+					i=3;
+					need_rotation=true;
+					y=Instantiate(window_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(0,1.725f,size_y-l-i/2);
+					y.transform.localScale=new Vector3(1.6f,1,1);
+					break;
+					case "o4":
+					x=Instantiate(wall_window_4m,transform.position,transform.rotation) as GameObject;
+					i=4;
+					need_rotation=true;
+					y=Instantiate(window_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(0,1.725f,size_y-l-i/2);
+					y.transform.localScale=new Vector3(2f,1,1);
+					break;
+				case "dm":
+					x=Instantiate(wall_door_1m,transform.position,transform.rotation) as GameObject;
+					i=1;
+					y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(0,1.25f,size_y-l-i/2);
+					y.transform.localScale=new Vector3(0.8f,1,1);
+					break;
+				case "dh":
+					x=Instantiate(wall_door_15m,transform.position,transform.rotation) as GameObject;
+					i=1.5f;
+					need_rotation=true;
+					y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(0,1.25f,size_y-l-i/2);
+					y.transform.localScale=new Vector3(1.2f,1,1);
+					break;
+				case "ds":
+					x=Instantiate(wall_door_2m,transform.position,transform.rotation) as GameObject;
+					i=2;
+					need_rotation=true; 
+					y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(0,1.25f,size_y-l-i/2);
+					y.transform.localScale=new Vector3(1.2f,1,1);
+					break;
+					case "e1":i=1;break;
+					case "eh": i=1.5f;break;
+					case "e2": i=2;break;
 					}
 					if (x!=null) {
 					x.transform.parent=room.transform;
-					x.transform.localPosition=new Vector3(0,1.5f,size_y-l-i/2);l+=i;
+					x.transform.localPosition=new Vector3(0,1.5f,size_y-l-i/2);
 					if (need_rotation) x.transform.localRotation=Quaternion.Euler(0,90,0); else x.transform.localRotation=Quaternion.Euler(0,-90,0);
 						x.GetComponent<Renderer>().material=wall_material;}
+				if (y!=null) {
+					y.transform.localRotation=Quaternion.Euler(0,90,0);
+					y=null;
+				}
+				    l+=i;
 					j+=2;
 				}
 		}
+		x=null;y=null;i=0;
 		//right_walls
 		if (right=="") {
-		i=0;
 		while (i+2<=size_y) {
 			x=Instantiate(wall_2m,transform.position,transform.rotation) as GameObject;
 			x.transform.parent=room.transform;
@@ -323,34 +430,84 @@ public class constructor : MonoBehaviour {
 			byte j=0;
 				i=size_y;
 				while (j<right.Length) {
-					l=0;
+				l=0;x=null;y=null;
 					bool need_rotation=false;
 					switch (right.Substring(j,2)) {
 					case "ws":x=Instantiate(wall_05m,transform.position,transform.rotation) as GameObject;l=0.5f;need_rotation=true;break;
 					case "wm":x=Instantiate(wall_1m,transform.position,transform.rotation) as GameObject;l=1;break;
 					case "wh":x=Instantiate(wall_15m,transform.position,transform.rotation) as GameObject;l=1.5f;need_rotation=true;break;
 					case "wt":x=Instantiate(wall_2m,transform.position,transform.rotation) as GameObject;l=2;break;
-					case "o2":x=Instantiate(wall_window_2m,transform.position,transform.rotation) as GameObject;l=2;break;	
-					case "o3":x=Instantiate(wall_window_3m,transform.position,transform.rotation) as GameObject;l=3;break;
-					case "o4":x=Instantiate(wall_window_4m,transform.position,transform.rotation) as GameObject;l=4;need_rotation=true;break;
-					case "dm":x=Instantiate(wall_door_1m,transform.position,transform.rotation) as GameObject;l=1;break;
-					case "dh":x=Instantiate(wall_door_15m,transform.position,transform.rotation) as GameObject;l=1.5f;need_rotation=true;break;
-					case "ds":x=Instantiate(wall_door_2m,transform.position,transform.rotation) as GameObject;l=2;need_rotation=true;break;
+				case "o2":
+					x=Instantiate(wall_window_2m,transform.position,transform.rotation) as GameObject;
+					l=2;
+					need_rotation=true;
+					y=Instantiate(window_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(size_x,1.725f,i-l/2);
+					break;	
+				case "o3":
+					x=Instantiate(wall_window_3m,transform.position,transform.rotation) as GameObject;
+					l=3;
+					y=Instantiate(window_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(size_x,1.725f,i-l/2);
+					y.transform.localScale=new Vector3(1.6f,1,1);
+					break;
+				case "o4":
+					x=Instantiate(wall_window_4m,transform.position,transform.rotation) as GameObject;
+					l=4;
+					need_rotation=true;
+					y=Instantiate(window_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(size_x,1.725f,i-l/2);
+					y.transform.localScale=new Vector3(2,1,1);
+					break;
+					case "dm":
+					x=Instantiate(wall_door_1m,transform.position,transform.rotation) as GameObject;
+					l=1;
+					y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(size_x,1.725f,i-l/2);
+					y.transform.localScale=new Vector3(0.8f,1,1);
+					break;
+					case "dh":
+					x=Instantiate(wall_door_15m,transform.position,transform.rotation) as GameObject;
+					l=1.5f;
+					need_rotation=true;
+					y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(size_x,1.25f,i-l/2);
+					y.transform.localScale=new Vector3(1.2f,1,1);
+					break;
+					case "ds":
+					x=Instantiate(wall_door_2m,transform.position,transform.rotation) as GameObject;
+					l=2;
+					need_rotation=true;
+					y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(size_x,1.25f,i-l/2);
+					y.transform.localScale=new Vector3(1.2f,1,1);
+					break;
 					case "e1":l=1;x=null;break;
 					case "eh": l=1.5f;x=null;break;
 					case "e2": l=2;x=null;break;
 					} 
 					if (x!=null) {
 					x.transform.parent=room.transform;
-					x.transform.localPosition=new Vector3(size_x,1.5f,i-l/2); i-=l;
+					x.transform.localPosition=new Vector3(size_x,1.5f,i-l/2);
+					if (y!=null) {
+						y.transform.localRotation=Quaternion.Euler(0,-90,0);
+						y=null;
+					}
+					i-=l;
 					if (need_rotation) x.transform.localRotation=Quaternion.Euler(0,-90,0); else x.transform.localRotation=Quaternion.Euler(0,90,0);
 					x.GetComponent<Renderer>().material=wall_material;
 					}
 					j+=2;
 				}
-		}
+		} 
 		//backwalls
-		i=0;
+		x=null;y=null;i=0;
 		if (back=="") {
 		while (i+2<=size_x) {
 			x=Instantiate(wall_2m,transform.position,transform.rotation) as GameObject;
@@ -369,26 +526,76 @@ public class constructor : MonoBehaviour {
 		else {
 			byte j=0;l=0;
 			while (j<back.Length) {
+				x=null;y=null;
 				bool need_rotation=false;
 				i=0;
 				switch (back.Substring(j,2)) {
 				case "ws":x=Instantiate(wall_05m,transform.position,transform.rotation) as GameObject;i=0.5f;need_rotation=true;break;
-				case "wm":x=Instantiate(wall_1m,transform.position,transform.rotation) as GameObject;i=1;break;
+				case "wm":x=Instantiate(wall_1m,transform.position,transform.rotation) as GameObject;i=1;need_rotation=true;break;
 				case "wh":x=Instantiate(wall_15m,transform.position,transform.rotation) as GameObject;i=1.5f;need_rotation=true;break;
 				case "wt":x=Instantiate(wall_2m,transform.position,transform.rotation) as GameObject;i=2;break;
-				case "o2":x=Instantiate(wall_window_2m,transform.position,transform.rotation) as GameObject;i=2;break;	
-				case "o3":x=Instantiate(wall_window_3m,transform.position,transform.rotation) as GameObject;i=3;need_rotation=true;break;
-				case "o4":x=Instantiate(wall_window_4m,transform.position,transform.rotation) as GameObject;i=4;need_rotation=true;break;
-				case "dm":x=Instantiate(wall_door_1m,transform.position,transform.rotation) as GameObject;i=1;break;
-				case "dh":x=Instantiate(wall_door_15m,transform.position,transform.rotation) as GameObject;i=1.5f;need_rotation=true;break;
-				case "ds":x=Instantiate(wall_door_2m,transform.position,transform.rotation) as GameObject;i=2;break;
+				case "o2":
+					x=Instantiate(wall_window_2m,transform.position,transform.rotation) as GameObject;
+					i=2;
+					y=Instantiate(window_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(l+i/2,1.725f,0);
+					y.transform.localScale=new Vector3(1,1,1);
+					break;	
+				case "o3":
+					x=Instantiate(wall_window_3m,transform.position,transform.rotation) as GameObject;
+					i=3;
+					need_rotation=true;
+					y=Instantiate(window_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(l+i/2,1.725f,0);
+					y.transform.localScale=new Vector3(1.6f,1,1);
+					break;
+				case "o4":
+					x=Instantiate(wall_window_4m,transform.position,transform.rotation) as GameObject;
+					i=4;
+					need_rotation=true;
+					y=Instantiate(window_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(l+i/2,1.725f,0);
+					y.transform.localScale=new Vector3(2,1,1);
+					break;
+				case "dm":
+					x=Instantiate(wall_door_1m,transform.position,transform.rotation) as GameObject;
+					i=1;
+					y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(l+i/2,1.25f,0);
+					y.transform.localScale=new Vector3(0.8f,1,1);
+					break;
+				case "dh":
+					x=Instantiate(wall_door_15m,transform.position,transform.rotation) as GameObject;
+					i=1.5f;
+					need_rotation=true;
+					y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(l+i/2,1.25f,0);
+					y.transform.localScale=new Vector3(1.2f,1,1);
+					break;
+				case "ds":
+					x=Instantiate(wall_door_2m,transform.position,transform.rotation) as GameObject;
+					i=2;
+					y=Instantiate(door_frame) as GameObject;
+					y.transform.parent=room.transform;
+					y.transform.localPosition=new Vector3(l+i/2,1.25f,0);
+					y.transform.localScale=new Vector3(1.2f,1,1);
+					break;
 				case "e1":i=1;x=null;break;
 				case "eh": i=1.5f;x=null;break;
 				case "e2": i=2;x=null;break;
 				}
 				if (x!=null) {
 					x.transform.parent=room.transform;
-					x.transform.localPosition=new Vector3(l+i/2,1.5f,0);l+=i;
+					x.transform.localPosition=new Vector3(l+i/2,1.5f,0);
+					if (y!=null) {
+						y.transform.localRotation=Quaternion.Euler(0,0,0);
+						y=null;}
+					l+=i;
 					if (!need_rotation) x.transform.localRotation=Quaternion.Euler(0,180,0);
 					x.GetComponent<Renderer>().material=wall_material;}
 				j+=2;
