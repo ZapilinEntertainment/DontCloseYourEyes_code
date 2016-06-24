@@ -1,184 +1,209 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class constructor : MonoBehaviour {
+public static class constructor{
 
+	public static Material potolok_material;
+	public static  Material floor_material;
+	public static  Material wall_material;
+	public static  Material outside_wall_material;
+	public static Material padik_wall_material;
+	public static Material padik_floor_material;
 
-	public float enter_width=1.5f;
-	public int q_x=15;
-	public int q_y=15;
-	public int entrance_y=11;
-	int q_number=1;
-	int floor_number=1;
-	Vector3 exit_position;
+	public static GameObject wall_window_2m;
+	public static GameObject wall_window_3m;
+	public static GameObject wall_window_4m;
+	public static GameObject wall_05m;
+	public static GameObject wall_1m;
+	public static GameObject wall_15m;
+	public static GameObject wall_2m;
+	public static GameObject wall_door_1m;
+	public static GameObject wall_door_15m;
+	public static GameObject wall_door_2m;
+	public static GameObject floor_tile;
+	public static GameObject door_frame;
+	public static GameObject window_frame;
+	public static GameObject ladder;
+	public static GameObject platform;
+	public static GameObject floor;
+	public static GameObject padik_door; //pddr
+		
 
-	public Material potolok_material;
-	public Material floor_material;
-	public Material wall_material;
-	public Material outside_wall_material;
-	public Material padik_wall_material;
-	public Material padik_floor_material;
+	public static GameObject CreatePadik (GameObject house,Vector3 pos, int q_x,int q_y,float e_x, float e_y,bool right_windows, bool left_windows,int number,int floors) 
+	{
+		if (e_y>q_y) e_y=q_y;
+		if (e_y<6) e_y=6;
+		if (e_x<4) e_x=4;
+		int j=0;
+		GameObject pad=new GameObject("padik"+number.ToString());
+		pad.transform.parent=house.transform;
+		pad.transform.localPosition=pos;
+		pad.transform.localRotation=Quaternion.Euler(0,0,0);
+		CreateWall (pad,q_x,new Vector3(0,-1.5f,q_y),'f',false,true,1); //left forward wall
+		CreateWall (pad,q_x,new Vector3(q_x+e_x,-1.5f,q_y),'f',false,true,1); //right forward wall
+		CreateWall (pad,2*q_x+e_x,new Vector3(0,-1.5f,0),'b',false,true,1); //backwall
 
-	GameObject wall_window_2m;
-	GameObject wall_window_3m;
-	GameObject wall_window_4m;
-	GameObject wall_05m;
-	GameObject wall_1m;
-	GameObject wall_15m;
-	GameObject wall_2m;
-	GameObject wall_door_1m;
-	GameObject wall_door_15m;
-	GameObject wall_door_2m;
-	GameObject floor_tile;
-	GameObject door_frame;
-	GameObject window_frame;
-	GameObject ladder;
+		if (right_windows) {
+			CreateWall (pad,q_y,new Vector3(e_x+2*q_x,-1.5f,q_y),'r',false,true,1); //right outside wall
+		}
+		CreateWall (pad,q_y-e_y,new Vector3(q_x,-1.5f,q_y),'r',false,true,1); //left inpassage wall
+		if (left_windows) {
+			CreateWall (pad,q_y,new Vector3(0,-1.5f,q_y),'l',false,true,1); //left outside wall
+		}
+		CreateWall (pad,q_y-e_y,new Vector3(q_x+e_x,-1.5f,q_y),'l',false,true,1); //right inpassage wall
 
-	GameObject platform;
-	GameObject floor;
+		//entrance
+		GameObject p=new GameObject("p00");
+		p.transform.parent=pad.transform;
+		p.transform.localRotation=Quaternion.Euler(0,0,0);
+		float ply=(e_y-2)/2.0f;
+		p.transform.localPosition=new Vector3(q_x,0,ply+2);
+		GameObject q=GameObject.Instantiate(ladder) as GameObject;
+		q.transform.parent=p.transform;
+		q.transform.localPosition=new Vector3(1,0.75f,-1);
+		q.transform.localRotation=Quaternion.Euler(0,0,0);
+		CreateWall (p,ply,new Vector3(0,0,ply),'l',false,false,2);
+		CreateWall (p,ply,new Vector3(e_x,0,ply),'r',false,false,2);
 
-	void Awake () {
-		wall_05m=Resources.Load<GameObject>("structures/wl05");
-		wall_1m=Resources.Load<GameObject>("structures/wl1m");
-		wall_15m=Resources.Load<GameObject>("structures/wl15");
-		wall_2m=Resources.Load<GameObject>("structures/wl2m");
-		floor_tile=Resources.Load<GameObject>("structures/flpl");
-		wall_window_2m=Resources.Load<GameObject>("structures/ww2m");
-		wall_window_3m=Resources.Load<GameObject>("structures/ww3m");
-		wall_window_4m=Resources.Load<GameObject>("structures/ww4m");
-		wall_door_1m=Resources.Load<GameObject>("structures/wd1m");
-		wall_door_15m=Resources.Load<GameObject>("structures/wd15");
-		wall_door_2m=Resources.Load<GameObject>("structures/wd2m");
-		door_frame=Resources.Load<GameObject>("structures/drfr");
-		window_frame=Resources.Load<GameObject>("structures/wwfr");
-		ladder=Resources.Load<GameObject>("structures/stld");
+		q=GameObject.Instantiate(padik_door) as GameObject;
+		q.name="fpddr000o";
+		q.transform.parent=p.transform;
+		q.transform.localPosition=new Vector3(e_x/2,1.5f,ply);
+		q.transform.localRotation=Quaternion.Euler(0,0,0);
+		if (e_x>3) {
+			CreateWall(p,e_x/2-1.5f,new Vector3(0,0,ply),'f',true,false,2);
+			CreateWall(p,e_x/2-1.5f,new Vector3(e_x/2+1.5f,0,ply),'f',true,false,2);
+		}
+
+		q=GameObject.Instantiate(Global.str_plate53degree) as GameObject;
+		q.transform.parent=p.transform;
+		q.transform.localPosition=new Vector3(e_x/2+1,0.75f,-1);
+		q.transform.localRotation=Quaternion.Euler(53,180,0);
+		q.transform.localScale=new Vector3(e_x-2,2.5f,1);
+		q=GameObject.Instantiate(Global.str_triangle2m) as GameObject;
+		q.transform.parent=p.transform;
+		q.transform.localPosition=new Vector3(e_x,1.5f,-1);
+		q.transform.localRotation=Quaternion.Euler(0,-90,0);
+		q.GetComponent<Renderer>().material=padik_wall_material;
+		q=GameObject.Instantiate(floor_tile) as GameObject;
+		q.transform.parent=p.transform;
+		q.transform.localPosition=new Vector3(e_x/2,0,ply/2);
+		q.transform.localRotation=Quaternion.Euler(0,0,0);
+		q.transform.localScale=new Vector3(e_x,1,ply);
+		q.GetComponent<Renderer>().material=padik_floor_material;
+		p.transform.localRotation=Quaternion.Euler(0,0,0);
+
+		string s;
+		int floor_number=1;
+		while (floor_number<floors) {
+			s=floor_number.ToString();
+			if (s.Length==1) s="p0"+s; else s='p'+s;		
+			CreatePlatform(floor_number,pad,new Vector3(q_x,floor_number*3,ply+2),e_x,ply);
+			CreateFloor(pad,floor_number,e_x,ply,q_x,q_y,right_windows,left_windows);
+			floor_number++;
+			// да сколько можно виснуть на вайлах!!!!
+		}
+		CreateFloor(pad,floor_number,e_x,ply,q_x,q_y,right_windows,left_windows);
+		padik pdo=pad.AddComponent<padik>();
+		pdo.q_x=q_x; pdo.q_y=q_y;pdo.e_x=e_x;
+		pdo.mySubsector=number;
+		if (house.GetComponent<house>()!=null) {
+			house h=house.GetComponent<house>();
+		pad.BroadcastMessage("FloorOptimization",(int)(h.ppos.y/h.floor_height+0.5f),SendMessageOptions.DontRequireReceiver);
+		}
+			return (pad);
 	}
 
-
-	void Start () {
-		entrance_y=q_y-entrance_y; if (entrance_y<0) entrance_y=0;
-		//entrance
-		GameObject p=new GameObject("p0");
-		p.transform.parent=transform;
-		p.transform.localRotation=Quaternion.Euler(0,0,0);
-		p.transform.localPosition=new Vector3(0,0,-q_y+9);
-		GameObject q=Instantiate(ladder) as GameObject;
-		q.transform.parent=p.transform;
-		q.transform.localPosition=new Vector3(-2,0.75f,-3);
-		q.transform.localRotation=Quaternion.Euler(0,0,0);
-		CreateBlock(p,new Vector3(-3,0,2),"lvt001",2);
-		CreateBlock(p,new Vector3(-3,0,0),"lvt002",2);
-		CreateBlock(p,new Vector3(3,0,2),"rvt001",2);
-		CreateBlock(p,new Vector3(3,0,0),"rvt002",2);
-		CreateBlock(p,new Vector3(3,0,-2),"rts000",2);
-		CreateBlock(p,new Vector3(-3,0,2),"fwt001",2);
-		CreateBlock(p,new Vector3(-1,0,2),"fds000",2);
-		CreateBlock(p,new Vector3(1,0,2),"fwt002",2);
-		q=Instantiate(Global.str_plate53degree) as GameObject;
-		q.transform.parent=p.transform;
-		q.transform.localPosition=new Vector3(1,0.75f,-3);
-		q.transform.localRotation=Quaternion.Euler(53,180,0);
-		q.transform.localScale=new Vector3(4,2.5f,1);
-		q=Instantiate(floor_tile) as GameObject;
-		q.transform.parent=p.transform;
-		q.transform.localPosition=new Vector3(0,0,0);
-		q.transform.localRotation=Quaternion.Euler(0,0,0);
-		q.transform.localScale=new Vector3(6,1,4);
-		q.GetComponent<Renderer>().material=padik_floor_material;
-
+	//----------------------------CREATE FLOOR----------------------
+	static GameObject CreateFloor (GameObject padik,int floor_number, float hall_x,float hall_y, int q_x,int q_y, bool right_windows,bool left_windows) {
 		//first floor
 		GameObject f=new GameObject();
 		f.name=floor_number.ToString();
 		if (f.name.Length==1) f.name="f0"+f.name; else f.name="f"+f.name;
-		f.transform.parent=transform;
-		f.transform.localPosition=new Vector3(0,1.5f,-q_y+2.5f);
+		f.transform.parent=padik.transform;
+		f.transform.localPosition=new Vector3(0,floor_number*3-1.5f,0);
 		f.transform.localRotation=Quaternion.Euler(0,0,0);
-		CreateDoor(f,new Vector3(-3,1.2f,-q_y+0.75f),new Vector3(0,90,0),enter_width,false);
-
+		CreateDoor(f,new Vector3(q_x,1.2f,0.25f),new Vector3(0,-90,0),1.5f,false);
+		CreateDoor(f,new Vector3(q_x+hall_x,1.2f,0.25f),new Vector3(0,-90,0),1.5f,false);
 		Quaternion rotation=Quaternion.identity;
-		q=CreateQuarteer_0(q_x,q_y,new Vector3(3,1.5f,-q_y),rotation,true,true,true,false,true,false,false); 
+		GameObject q=CreateQuarteer_0(f,q_x,q_y,new Vector3(q_x+hall_x,0,0),rotation,hall_y*2+2,true,true,right_windows,false,true,false,false); 
+		q.name="qr";
+		q=CreateQuarteer_0(f,q_x,q_y,new Vector3(0,0,0),rotation,hall_y*2+2,true,true,left_windows,false,true,true,false);
 		q.transform.parent=f.transform;
-		q.name='q'+f.name.Substring(1,2)+q_number.ToString();
-		if (q.name.Length==4) {q.name=q.name.Substring(0,3)+'0'+q.name[3];}
-		q_number++;
-		q=CreateQuarteer_0(q_x,q_y,new Vector3(-q_x-3,1.5f,-q_y),rotation,true,true,true,false,true,true,false);
-		q.transform.parent=f.transform;
-		q.name='q'+f.name.Substring(1,2)+q_number.ToString();
-		if (q.name.Length==4) {q.name=q.name.Substring(0,3)+'0'+q.name[3];}
-		q_number++;
-		p=new GameObject("hall");
+		q.name="ql";
+
+		GameObject p=new GameObject("hall");
 		p.transform.parent=f.transform;
-		p.transform.localPosition=Vector3.zero;
-		p.transform.localRotation=Quaternion.identity;
-		q=Instantiate(floor_tile) as GameObject ;
-		q.transform.parent=p.transform;
-	    q.transform.localPosition=new Vector3(0,1.5f,-q_y+2.5f);
-		q.transform.localRotation=Quaternion.Euler(0,0,0);
-		q.transform.localScale=new Vector3(6,1,5);
-		q.GetComponent<Renderer>().material=padik_floor_material;
-		float a=q_y/3; if (a<2) a=2; //kitchen_y
-		float b=(q_y-a)/2; if (b>4) b=4; //san_y
-		a=q_y-a-b;//passage_y 
-		if (a>5) a=5;
-		string s="";
-		switch ((byte)(enter_width*10)) {
-		case 10: s="rm"; break;
-		case 15: s="rh";break;
-		case 20: s="rs";break;
-		}
-		CreateBlock(p,new Vector3(-3,1.5f,-q_y+a),'l'+s+"000",2);
-		CreateBlock(p,new Vector3(3,1.5f,-q_y+a),'r'+s+"000",2);
-		s=WallsDivide(a-enter_width,false);
-		byte j=0; float l=a-enter_width;
-		while (j<s.Length) {
-			CreateBlock(p,new Vector3(-3,1.5f,-q_y+l),'l'+s.Substring(j,2)+"000",2);
-			l-=CreateBlock(p,new Vector3(3,1.5f,-q_y+l),'r'+s.Substring(j,2)+"000",2);
-			j+=2;
-		}
-		//first platform	
-		p=new GameObject("p1");
-		p.transform.parent=transform;
-		p.transform.localPosition=new Vector3(0,3,0);
+		p.transform.localPosition=new Vector3(q_x,0,0);
 		p.transform.localRotation=Quaternion.Euler(0,0,0);
-		q=Instantiate(ladder) as GameObject;
+		q=GameObject.Instantiate(floor_tile) as GameObject ;
 		q.transform.parent=p.transform;
-		q.transform.localPosition=new Vector3(2,-0.75f,-q_y+6);
-		q.transform.localRotation=Quaternion.Euler(0,180,0);
-		q=Instantiate(floor_tile) as GameObject;
-		q.transform.parent=p.transform;
-		q.transform.localPosition=new Vector3(0,0,-q_y+9);
+		q.transform.localPosition=new Vector3(hall_x/2,0,hall_y/2);
 		q.transform.localRotation=Quaternion.Euler(0,0,0);
-		q.transform.localScale=new Vector3(6,1,4);
+		q.transform.localScale=new Vector3(hall_x,1,hall_y);
 		q.GetComponent<Renderer>().material=padik_floor_material;
-		q=Instantiate(q,q.transform.position,q.transform.rotation) as GameObject;
+		q=GameObject.Instantiate(q,q.transform.position,q.transform.rotation) as GameObject ;
 		q.transform.parent=p.transform;
 		q.transform.Translate(0,-0.1f,0);
 		q.transform.Rotate(180,0,0);
-		q=Instantiate(ladder) as GameObject;
-		q.transform.parent=p.transform;
-		q.transform.localPosition=new Vector3(-2,0.75f,-q_y+6);
-		q.transform.localRotation=Quaternion.Euler(0,0,0);
-		q=Instantiate(wall_1m) as GameObject;
-		q.transform.parent=p.transform;
-		q.transform.localPosition=new Vector3(0,-0.05f,-q_y+7);
-		q.transform.localRotation=Quaternion.Euler(0,180,0);
-		q.transform.localScale=new Vector3(2,0.034f,1);
 		q.GetComponent<Renderer>().material=padik_floor_material;
-		CreateBlock(p,new Vector3(-3,0,-q_y+11),"lvt000",2);
-		CreateBlock(p,new Vector3(-3,0,-q_y+9),"lvt001",2);
-		CreateBlock(p,new Vector3(3,0,-q_y+11),"rvt000",2);
-		CreateBlock(p,new Vector3(3,0,-q_y+9),"rvt001",2);
+		q=GameObject.Instantiate(wall_2m) as GameObject;
+		q.transform.parent=p.transform;
+		q.transform.localPosition=new Vector3(hall_x/2,-0.05f,hall_y);
+		q.transform.localRotation=Quaternion.Euler(0,180,0);
+		q.transform.localScale=new Vector3(hall_x,0.1f,1);
+		q.GetComponent<Renderer>().material=padik_floor_material;
+		CreateWall(p,hall_y-1.5f,new Vector3(0,0,hall_y),'l',false,false,2);
+		CreateBlock(p,new Vector3(0,0,1.5f),"lrh000",2);
+		CreateWall(p,hall_y-1.5f,new Vector3(hall_x,0,hall_y),'r',false,false,2);
+		CreateBlock(p,new Vector3(hall_x,0,1.5f),"rrh000",2);
+		CreateWindows(p,hall_x,Vector3.zero,'b',2);
+		return(f);
+	}
 
-		CreateBlock(p,new Vector3(-3,0,-q_y+11),"fwm000",2);
-		CreateBlock(p,new Vector3(-2,0,-q_y+11),"fo4000",2);
-		CreateBlock(p,new Vector3(2,0,-q_y+11),"fwm001",2);
+	//---------------------CREATE PLATFORM-----------------------
+	static GameObject CreatePlatform(int floor,GameObject padik, Vector3 pos,float width,float length) {
+		GameObject p=new GameObject('p'+floor.ToString());
+		if (p.name.Length==2) p.name="p0"+floor.ToString();
+		p.transform.parent=padik.transform;
+		p.transform.localPosition=pos;
+		p.transform.localRotation=Quaternion.Euler(0,0,0);
+		GameObject q=GameObject.Instantiate(ladder) as GameObject;
+		q.transform.parent=p.transform;
+		q.transform.localPosition=new Vector3(width-1,-0.75f,-1);
+		q.transform.localRotation=Quaternion.Euler(0,180,0);
+		q=GameObject.Instantiate(floor_tile) as GameObject;
+		q.transform.parent=p.transform;
+		q.transform.localPosition=new Vector3(width/2,0,length/2);
+		q.transform.localRotation=Quaternion.Euler(0,0,0);
+		q.transform.localScale=new Vector3(width,1,length);
+		q.GetComponent<Renderer>().material=padik_floor_material;
+		q=GameObject.Instantiate(q,q.transform.position,q.transform.rotation) as GameObject;
+		q.transform.parent=p.transform;
+		q.transform.Translate(0,-0.1f,0);
+		q.transform.Rotate(180,0,0);
+		q.GetComponent<Renderer>().material=padik_floor_material;
+		q=GameObject.Instantiate(ladder) as GameObject;
+		q.transform.parent=p.transform;
+		q.transform.localPosition=new Vector3(1,0.75f,-1);
+		q.transform.localRotation=Quaternion.Euler(0,0,0);
+		CreateWall(p,length,new Vector3(0,0,length),'l',false,false,2);
+		CreateWall(p,length,new Vector3(width,0,length),'r',false,false,2);
+		CreateWindows(p,width,new Vector3(0,0,length),'f',2);
+		q=GameObject.Instantiate(wall_2m) as GameObject;
+		q.transform.parent=p.transform;
+		q.transform.localPosition=new Vector3(width/2,-0.05f,0);
+		q.transform.localRotation=Quaternion.Euler(0,0,0);
+		q.transform.localScale=new Vector3(width,0.1f,1);
+		q.GetComponent<Renderer>().material=padik_floor_material;
+		return(p);
 	}
 
 	//если сделать несколько разных алгоритмов сборки, то стоит воспользоваться делегатами
 	//и выделить процесс расчета комнат в отдельные функции
-	GameObject CreateQuarteer_0(int xsize, int ysize,Vector3 pos,Quaternion rot, bool fwd_open,bool back_open,bool right_open,bool left_open,bool left_exit,bool mirror_x,bool mirror_y) {
+	static GameObject CreateQuarteer_0(GameObject floor,int xsize, int ysize,Vector3 pos,Quaternion rot, float e_y, bool fwd_open,bool back_open,bool right_open,bool left_open,bool left_exit,bool mirror_x,bool mirror_y) {
 		GameObject quarteer=new GameObject();
-		quarteer.transform.parent=transform;
+		quarteer.transform.parent=floor.transform;
 		quarteer.transform.localPosition=pos;
 		quarteer.transform.localRotation=rot;
 		int rooms_n=0;
@@ -226,18 +251,19 @@ public class constructor : MonoBehaviour {
 			central_x=xsize-kitchen_x-rooms_x;
 		} else central_x=xsize-kitchen_x;
 		//сборка
-		byte i=0; float z=0; //ширина подвижной части
+		byte i=0; 
+		float z=0;
+		float dvz=ysize-e_y;
+		if (dvz<0) dvz=0;	//ширина внутреннего дворика
 		string fwd=""; string back="";string right="";string left="";
 		string center_right=""; string center_left="";
 		//kitchen
 		if (fwd_open) fwd=WindowsDivide(kitchen_x); else fwd=WallsDivide(kitchen_x,false);
-		z=kitchen_y-entrance_y;
-		if (z<=0) left=WindowsDivide(kitchen_y);
+		if (dvz>=kitchen_y&&dvz>=2) {left=WindowsDivide(kitchen_y);dvz-=kitchen_y;}
 		else {
-		if (left_open) left=WindowsDivide(entrance_y)+WallsDivide(kitchen_x-entrance_y,false); 
-		else left=WallsDivide(entrance_y,true)+WallsDivide(kitchen_y-entrance_y,false);
-	}
-		z=0;
+			left=WindowsDivide(dvz)+WallsDivide(kitchen_y-dvz,false);
+			dvz=0;
+		}
 		back=WallsDivide(kitchen_x,false);
 		if (kitchen_y>3) {
 			right=WallsDivide(kitchen_y-1.5f,false)+"rh";
@@ -261,18 +287,24 @@ public class constructor : MonoBehaviour {
 		fwd="";back="";right="";
 
 		//toilet&bath
-		if (left_open) left=WindowsDivide(san_y); else left=WallsDivide(san_y,false);
+		if (dvz>=san_y&&dvz>=2) {
+			left=WindowsDivide(san_y);dvz-=san_y;
+		}
+		else {
+			left=WindowsDivide(dvz)+WallsDivide(san_y-dvz,false);
+			dvz=0;
+		}
 			back=""; //инверсия back и fwd для более удобного построения passage
 			if (kitchen_x>=3) {z=1.5f;back="rh";}	else {z=1;back="rm";}
 			fwd=WallsDivide(kitchen_x/2.0f-z,false);
 		if (mirror_x) {
-			ConstructRoom(quarteer,kitchen_x/2.0f,san_y,q_x-kitchen_x/2.0f,passage_y,"bath",WallsDivide(kitchen_x/2.0f,false),back+fwd,WallsDivide(san_y,left_open),WallsDivide(san_y,false));
-			ConstructRoom(quarteer,kitchen_x/2.0f,san_y,q_x-kitchen_x,passage_y,"toil",WallsDivide(kitchen_x/2.0f,false),fwd+back,WallsDivide(san_y,false),WallsDivide(san_y,false));
+			ConstructRoom(quarteer,kitchen_x/2.0f,san_y,xsize-kitchen_x/2.0f,passage_y,"bath",WallsDivide(kitchen_x/2.0f,false),back+fwd,left,WallsDivide(san_y,false));
+			ConstructRoom(quarteer,kitchen_x/2.0f,san_y,xsize-kitchen_x,passage_y,"toil",WallsDivide(kitchen_x/2.0f,false),fwd+back,WallsDivide(san_y,false),WallsDivide(san_y,false));
 			CreateDoor(quarteer,new Vector3(xsize-kitchen_x/2.0f-z/2.0f-0.5f*(z/1.5f),1.2f,passage_y),new Vector3(0,0,0),z,false);
 			CreateDoor(quarteer,new Vector3(xsize-kitchen_x/2.0f+z/2.0f-0.5f*(z/1.5f),1.2f,passage_y),new Vector3(0,0,0),z,false);
 		}
 		else {
-			ConstructRoom(quarteer,kitchen_x/2.0f,san_y,0,passage_y,"bath",WallsDivide(kitchen_x/2.0f,false),fwd+back,WallsDivide(san_y,left_open),WallsDivide(san_y,false));
+			ConstructRoom(quarteer,kitchen_x/2.0f,san_y,0,passage_y,"bath",WallsDivide(kitchen_x/2.0f,false),fwd+back,WallsDivide(san_y,left_open),left);
 			ConstructRoom(quarteer,kitchen_x/2.0f,san_y,kitchen_x/2.0f,passage_y,"toil",WallsDivide(kitchen_x/2.0f,false),back+fwd,WallsDivide(san_y,false),WallsDivide(san_y,false));
 			CreateDoor(quarteer,new Vector3(kitchen_x/2.0f-z/2.0f-0.5f*(z/1.5f),1.2f,passage_y),new Vector3(0,0,0),z,false);
 			CreateDoor(quarteer,new Vector3(kitchen_x/2.0f+z/2.0f-0.5f*(z/1.5f),1.2f,passage_y),new Vector3(0,0,0),z,false);
@@ -293,27 +325,23 @@ public class constructor : MonoBehaviour {
 			}
 		}
 		if (left_exit) {
-		back=WallsDivide((passage_y-enter_width),false); //временный расчет для левой стены
-		i=(byte)(enter_width*10);
-		switch (i) {
-			case 10: left="rm";break;
-			case 15: left="rh";break;
-			case 20: left="rs";break;
-		}
+			if (dvz>=passage_y-1.5f&&dvz>=2) {
+				back=WallsDivide(passage_y-1.5f,true);
+			}	
+			else {
+				back=WallsDivide(dvz,true)+WallsDivide(passage_y-1.5f-dvz,false);
+			}
+			dvz=0;
+			//временный расчет для левой стены
 		i=0;
-		left+=back;
+		left=back+"rh";
 			if (back_open) back=WindowsDivide(kitchen_x); else back=WallsDivide(kitchen_x,false);
 		}
 		else {
 			//выход снизу
 			left=WallsDivide(passage_y,false);
-			i=(byte)(enter_width*10);
-			switch (i) {
-			case 10: back="rm";break;
-			case 15: back="rh";break;
-			case 20: back="rs";break;
-			} i=0;
-			back+=WallsDivide(kitchen_x-enter_width,false);
+			back="rh"; i=0;
+			back+=WallsDivide(kitchen_x-1.5f,false);
 		}
 		if (z==1) fwd=fwd+"rmrm"+fwd;
 		else fwd=fwd+"rhrh"+fwd;
@@ -425,7 +453,7 @@ public class constructor : MonoBehaviour {
 
 	///// ----------------------------------------------CREATE BLOCK
 
-	float CreateBlock(GameObject room,Vector3 start_pos,string code,int matcode) {
+	static float CreateBlock(GameObject room,Vector3 start_pos,string code,int matcode) {
 		bool need_rotation=false;
 		bool other_side=false;
 		GameObject x=null;
@@ -435,66 +463,66 @@ public class constructor : MonoBehaviour {
 		float i=0; //длина блока 
 		float z=0; //длина подвижной части
 		switch (code.Substring(1,2)) {
-		case "ws":x=Instantiate(wall_05m) as GameObject;i=0.5f;need_rotation=true;other_side=true;obj_id="wl05";break;
-		case "vs":x=Instantiate(wall_05m) as GameObject;i=0.5f;need_rotation=true;obj_id="wl05";break;
-		case "wm":x=Instantiate(wall_1m) as GameObject;i=1;need_rotation=true;other_side=true;obj_id="wl1m";break;
-		case "vm":x=Instantiate(wall_1m) as GameObject;i=1;need_rotation=true;obj_id="wl1m";break;
-		case "wh":x=Instantiate(wall_15m) as GameObject;i=1.5f;need_rotation=true;other_side=true;obj_id="wl15";break;
-		case "vh":x=Instantiate(wall_15m) as GameObject;i=1.5f;need_rotation=true;obj_id="wl15";break;
-		case "wt":x=Instantiate(wall_2m) as GameObject;i=2;other_side=true;obj_id="wl2m";break;
-		case "vt":x=Instantiate(wall_2m) as GameObject;i=2;obj_id="wl2m";break;
+		case "ws":x=GameObject.Instantiate(wall_05m) as GameObject;i=0.5f;need_rotation=true;other_side=true;obj_id="wl05";break;
+		case "vs":x=GameObject.Instantiate(wall_05m) as GameObject;i=0.5f;need_rotation=true;obj_id="wl05";break;
+		case "wm":x=GameObject.Instantiate(wall_1m) as GameObject;i=1;need_rotation=true;other_side=true;obj_id="wl1m";break;
+		case "vm":x=GameObject.Instantiate(wall_1m) as GameObject;i=1;need_rotation=true;obj_id="wl1m";break;
+		case "wh":x=GameObject.Instantiate(wall_15m) as GameObject;i=1.5f;need_rotation=true;other_side=true;obj_id="wl15";break;
+		case "vh":x=GameObject.Instantiate(wall_15m) as GameObject;i=1.5f;need_rotation=true;obj_id="wl15";break;
+		case "wt":x=GameObject.Instantiate(wall_2m) as GameObject;i=2;other_side=true;obj_id="wl2m";break;
+		case "vt":x=GameObject.Instantiate(wall_2m) as GameObject;i=2;obj_id="wl2m";break;
 		case "o2":
-			x=Instantiate(wall_window_2m) as GameObject;
+			x=GameObject.Instantiate(wall_window_2m) as GameObject;
 			i=2;
-			y=Instantiate(window_frame) as GameObject;
+			y=GameObject.Instantiate(window_frame) as GameObject;
 			y_height=1.725f;
 			other_side=true;
 			obj_id="ww2m";
 			need_rotation=true;
 			break;	
 		case "o3":
-			x=Instantiate(wall_window_3m) as GameObject;
+			x=GameObject.Instantiate(wall_window_3m) as GameObject;
 			i=3;
 			need_rotation=true;
-			y=Instantiate(window_frame) as GameObject;
+			y=GameObject.Instantiate(window_frame) as GameObject;
 			y_height=1.725f;
 			y.transform.localScale=new Vector3(1.6f,1,1);
 			other_side=true;
 			obj_id="ww3m";
 			break;
 		case "o4":
-			x=Instantiate(wall_window_4m) as GameObject;
+			x=GameObject.Instantiate(wall_window_4m) as GameObject;
 			i=4;
 			need_rotation=true;
-			y=Instantiate(window_frame) as GameObject;
+			y=GameObject.Instantiate(window_frame) as GameObject;
 			y_height=1.725f;
 			y.transform.localScale=new Vector3(2,1,1);
 			other_side=true;
 			obj_id="ww4m";
 			break;
 		case "dm":
-			x=Instantiate(wall_door_1m) as GameObject;
+			x=GameObject.Instantiate(wall_door_1m) as GameObject;
 			i=1;
-			y=Instantiate(door_frame) as GameObject;
+			y=GameObject.Instantiate(door_frame) as GameObject;
 			y_height=1.25f;
 			y.transform.localScale=new Vector3(0.8f,1,1);
 			obj_id="wd1m";
 			other_side=true;
 			break;
 		case "dh":
-			x=Instantiate(wall_door_15m) as GameObject;
+			x=GameObject.Instantiate(wall_door_15m) as GameObject;
 			i=1.5f;
 			need_rotation=true;
-			y=Instantiate(door_frame) as GameObject;
+			y=GameObject.Instantiate(door_frame) as GameObject;
 			y_height=1.25f;
 			y.transform.localScale=new Vector3(1.2f,1,1);
 			obj_id="wd15";
 			other_side=true;
 			break;
 		case "ds":
-			x=Instantiate(wall_door_2m) as GameObject;
+			x=GameObject.Instantiate(wall_door_2m) as GameObject;
 			i=2;
-			y=Instantiate(door_frame) as GameObject;
+			y=GameObject.Instantiate(door_frame) as GameObject;
 			y_height=1.25f;
 			y.transform.localScale=new Vector3(1.2f,1,1);
 			obj_id="wd2m";
@@ -502,39 +530,40 @@ public class constructor : MonoBehaviour {
 			need_rotation=true;
 			break;
 		case "rm":
-			x=Instantiate(wall_door_1m) as GameObject;
+			x=GameObject.Instantiate(wall_door_1m) as GameObject;
 			i=1;
-			y=Instantiate(door_frame) as GameObject;
+			y=GameObject.Instantiate(door_frame) as GameObject;
 			y_height=1.25f;
 			y.transform.localScale=new Vector3(0.8f,1,1);
 			obj_id="wd1m";
 			need_rotation=true;
 			break;
 		case "rh":
-			x=Instantiate(wall_door_15m) as GameObject;
+			x=GameObject.Instantiate(wall_door_15m) as GameObject;
 			i=1.5f;
 			need_rotation=true;
-			y=Instantiate(door_frame) as GameObject;
+			y=GameObject.Instantiate(door_frame) as GameObject;
 			y_height=1.25f;
 			y.transform.localScale=new Vector3(1.2f,1,1);
 			obj_id="wd15";
 			break;
 		case "rs":
-			x=Instantiate(wall_door_2m) as GameObject;
+			x=GameObject.Instantiate(wall_door_2m) as GameObject;
 			i=2;
-			y=Instantiate(door_frame) as GameObject;
+			y=GameObject.Instantiate(door_frame) as GameObject;
 			y_height=1.25f;
 			y.transform.localScale=new Vector3(1.2f,1,1);
 			obj_id="wd2m";
+			need_rotation=true;
 			break;
 		case "ts":
-			x=Instantiate(Global.str_triangle2m) as GameObject;
+			x=GameObject.Instantiate(Global.str_triangle2m) as GameObject;
 			i=2;
 			obj_id="tr2m";
 			need_rotation=true;
 			break;
 		case "to":
-			x=Instantiate(Global.str_triangle2m) as GameObject;
+			x=GameObject.Instantiate(Global.str_triangle2m) as GameObject;
 			i=2;
 			obj_id="tr2m";
 			need_rotation=true;
@@ -569,9 +598,9 @@ public class constructor : MonoBehaviour {
 					y.name=y.name.Substring(0,4)+code.Substring(3,3)+'i';
 				}
 				if (other_side) {
-					x=Instantiate(x,x.transform.position,x.transform.rotation) as GameObject;
+					x=GameObject.Instantiate(x,x.transform.position,x.transform.rotation) as GameObject;
 					x.transform.Rotate(0,180,0);
-					x.transform.parent=GetComponent<house>().out_fwd.transform;
+					x.transform.parent=room.transform;
 					x.GetComponent<Renderer>().material=outside_wall_material;
 					x.name=obj_id+code.Substring(3,3)+'o';
 					x.GetComponent<Renderer>().material=outside_wall_material;break;
@@ -598,9 +627,9 @@ public class constructor : MonoBehaviour {
 					case 6:  x.GetComponent<Renderer>().material=potolok_material;break;
 					}}
 				if (other_side) {
-					x=Instantiate(x,x.transform.position,x.transform.rotation) as GameObject;
+					x=GameObject.Instantiate(x,x.transform.position,x.transform.rotation) as GameObject;
 					x.transform.Rotate(0,180,0);
-					x.transform.parent=GetComponent<house>().out_back.transform;
+					x.transform.parent=room.transform;
 					x.GetComponent<Renderer>().material=outside_wall_material;
 					x.name=obj_id+code.Substring(3,3)+'o';
 					x.GetComponent<Renderer>().material=outside_wall_material;break;
@@ -627,9 +656,9 @@ public class constructor : MonoBehaviour {
 					case 6:  x.GetComponent<Renderer>().material=potolok_material;break;
 					}}
 				if (other_side) {
-					x=Instantiate(x,x.transform.position,x.transform.rotation) as GameObject;
+					x=GameObject.Instantiate(x,x.transform.position,x.transform.rotation) as GameObject;
 					x.transform.Rotate(0,180,0);
-					x.transform.parent=GetComponent<house>().out_right.transform;
+					x.transform.parent=room.transform;
 					x.GetComponent<Renderer>().material=outside_wall_material;
 					x.name=obj_id+code.Substring(3,3)+'o';
 					x.GetComponent<Renderer>().material=outside_wall_material;break;
@@ -656,9 +685,9 @@ public class constructor : MonoBehaviour {
 					case 6:  x.GetComponent<Renderer>().material=potolok_material;break;
 					}}
 				if (other_side) {
-					x=Instantiate(x,x.transform.position,x.transform.rotation) as GameObject;
+					x=GameObject.Instantiate(x,x.transform.position,x.transform.rotation) as GameObject;
 					x.transform.Rotate(0,180,0);
-					x.transform.parent=GetComponent<house>().out_left.transform;
+					x.transform.parent=room.transform;
 					x.GetComponent<Renderer>().material=outside_wall_material;
 					x.name=obj_id+code.Substring(3,3)+'o';
 					x.GetComponent<Renderer>().material=outside_wall_material;break;
@@ -666,12 +695,13 @@ public class constructor : MonoBehaviour {
 				break;
 			}
 		}
+		if (code.Length==7) x.name=x.name.Substring(0,8)+code[6];
 		return(i);
 	}
 
 	//---------------------------------------------------CONSTRUCT ROOM
 
-	GameObject ConstructRoom(GameObject quarteer,float size_x,float size_y,float xpos,float ypos,string nm,string fwd,string back,string right,string left) {
+	static GameObject ConstructRoom(GameObject quarteer,float size_x,float size_y,float xpos,float ypos,string nm,string fwd,string back,string right,string left) {
 		GameObject room=new GameObject(nm);
 		room.transform.parent=quarteer.transform;
 		room.transform.localPosition=new Vector3(xpos,0,ypos);
@@ -680,7 +710,7 @@ public class constructor : MonoBehaviour {
 		if ((int)(size_x)%2!=0) havehalf_x=true;
 		if ((int)(size_y)%2!=0) havehalf_y=true;
 		//floor&&roof
-		GameObject x=Instantiate(floor_tile,transform.position,transform.rotation) as GameObject;
+		GameObject x=GameObject.Instantiate(floor_tile) as GameObject;
 		x.transform.parent=room.transform;
 		x.transform.localPosition=new Vector3(size_x/2.0f,0,size_y/2.0f);
 		x.transform.localScale=new Vector3(size_x,1,size_y);
@@ -688,19 +718,30 @@ public class constructor : MonoBehaviour {
 		x.GetComponent<Renderer>().material=floor_material;
 		x.name="dflpl001i";
 
-		x=Instantiate(floor_tile,transform.position,transform.rotation) as GameObject;
+		x=GameObject.Instantiate(floor_tile) as GameObject;
 		x.transform.parent=room.transform;
-		x.transform.localPosition=new Vector3(size_x/2.0f,3,size_y/2.0f);
+		x.transform.localPosition=new Vector3(size_x/2.0f,2.9f,size_y/2.0f);
 		x.transform.localScale=new Vector3(size_x,1,size_y);
 		x.transform.localRotation=Quaternion.Euler(180,0,0);
 		x.GetComponent<Renderer>().material=potolok_material;
 		x.name="uflpl001i";
+
+		//автозаполнение
+		if (fwd=="sfwl") fwd=WallsDivide(size_x,true);
+		if (fwd=="sfws") fwd=WindowsDivide(size_x);
+		if (back=="sfwl") back=WallsDivide(size_x,true);
+		if (back=="sfws") back=WindowsDivide(size_x);
+		if (right=="sfwl") right=WallsDivide(size_y,true);
+		if (right=="sfws") right=WindowsDivide(size_y);
+		if (left=="sfwl") left=WallsDivide(size_y,true);
+		if (left=="sfws") left=WindowsDivide(size_y);
 
 		float i=0; float l=0; 
 		string h="";
 		ushort c=0;
 		//fwd_walls
 			byte j=0;
+
 		if (fwd.Length!=0) {
 			while (j<fwd.Length) {
 			h=c.ToString();
@@ -754,12 +795,15 @@ public class constructor : MonoBehaviour {
 			j+=2;
 			c++;
 			}}
+		room_optimizer or=room.AddComponent<room_optimizer>();
+		or.xsize=size_x;
+		or.ysize=size_y;
 		return(room);
 	}
 		
 	//------------------------------------------WALLS DIVIDE
 
-	string WallsDivide (float l, bool doubleside) { //поблочное разделение стенами и возврат шифрованной строкой
+	static string WallsDivide (float l, bool doubleside) { //поблочное разделение стенами и возврат шифрованной строкой
 		if (l<=0) return("");
 		byte x=(byte) l;
 		bool have_half=false;
@@ -784,7 +828,9 @@ public class constructor : MonoBehaviour {
 		return (s);
 	}
 
-	string WindowsDivide (float l) { //заполнение окнами по мере возможности
+	//--------------------------------------WINDOWS DIVIDE
+
+	static string WindowsDivide (float l) { //заполнение окнами по мере возможности
 		if (l<=0) return ("");
 		byte x=(byte)l;
 		bool have_half=false; if (l-x==0.5f) have_half=true;
@@ -808,8 +854,45 @@ public class constructor : MonoBehaviour {
 		return (s);
 	}
 
-	GameObject CreateDoor(GameObject quarteer,Vector3 pos, Vector3 rot,float width,bool doublesided) {
-		GameObject x=Instantiate(Global.str_door) as GameObject;
+	static void CreateWall (GameObject parent, float l,Vector3 startpos,char side,bool doubleside,bool outside,int matcode) {
+		//outside - внешняя односторонняя стена
+		string s=WallsDivide(l,doubleside);
+		if (s.Length<=0) return;
+		int j=0; float i=0;
+		Vector3 mv_vector=Vector3.zero;
+		switch (side) {
+		case 'f': mv_vector=Vector3.right;if (outside) side='b';break;
+		case 'b': mv_vector=Vector3.right;if (outside) side='f';break;
+		case 'r': mv_vector=Vector3.back;if (outside) side='l';break;
+		case 'l':mv_vector=Vector3.back;if (outside) side='r';break;
+		}
+		while (j<s.Length) {
+			if (outside) i+=CreateBlock(parent,startpos+mv_vector*i,side+s.Substring(j,2)+"000o",matcode);
+			else i+=CreateBlock(parent,startpos+mv_vector*i,side+s.Substring(j,2)+"000",matcode);
+			j+=2;
+		}
+	}
+
+	static void CreateWindows (GameObject parent, float l,Vector3 startpos,char side,int matcode) {
+		//outside - внешняя односторонняя стена
+		string s=WindowsDivide(l);
+		if (s.Length<=0) return;
+		int j=0; float i=0;
+		Vector3 mv_vector=Vector3.zero;
+		switch (side) {
+		case 'f': mv_vector=Vector3.right;break;
+		case 'b': mv_vector=Vector3.right;break;
+		case 'r': mv_vector=Vector3.back;break;
+		case 'l':mv_vector=Vector3.back;break;
+		}
+		while (j<s.Length) {
+			i+=CreateBlock(parent,startpos+mv_vector*i,side+s.Substring(j,2)+"000",matcode);
+			j+=2;
+		}
+	}
+
+	static GameObject CreateDoor(GameObject quarteer,Vector3 pos, Vector3 rot,float width,bool doublesided) {
+		GameObject x=GameObject.Instantiate(Global.str_door) as GameObject;
 		x.transform.parent=quarteer.transform;
 		x.transform.localRotation=Quaternion.Euler(rot);
 		x.GetComponent<door>().double_sided=doublesided;
@@ -817,5 +900,9 @@ public class constructor : MonoBehaviour {
 		x.transform.localPosition=pos;
 		return (x);
 	}
+
+
+
+
 		
 }
