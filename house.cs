@@ -3,36 +3,30 @@ using System.Collections;
 
 public class house : MonoBehaviour {
 	bool inside=false;
-	public int q_x=15;
-	public int q_y=15;
-	public int e_x=6;
-	public int e_y=6;
+	public int q_x=15; //flat width
+	public int q_y=15; //flat length
+	public int e_x=6; //entrance width
+	public int e_y=6; //entrance length
 	public int floors =5;
 	public float floor_height=3;
 	public int padiks=1;
 	public byte player_sector=0;
-	byte player_subsector=0;
+	public byte player_subsector=0;
 	byte prev_sector=0;
 	byte prev_subsector=0;
 	public int rsize_x=0;
 	public Vector3 ppos;
 	public int player_floor=0;
 
-	void Start () {
-		bool left=true;
-		bool right =false;
-		for (byte i=1;i<=padiks;i++) {
-			if (i==padiks) right=true;
-			constructor.CreatePadik(gameObject,new Vector3((q_x*2+e_x)*(i-1),0,0),q_x,q_y,e_x,e_y,right,left,i,floors);
-			left=false;
-		}
-		rsize_x=(q_x*2+e_x)*padiks;
-	}
 
 	void Update () {
-		ppos=transform.InverseTransformPoint(Global.player.transform.position);
-		int nf=(int)(ppos.y/floor_height+0.5f);
-		if (nf!=player_floor) {player_floor=nf;}
+		ppos=transform.InverseTransformPoint(Global.ppos);
+		int player_current_height=(int)(ppos.y/floor_height+0.5f);
+		if (player_current_height!=player_floor) {player_floor=player_current_height;}
+
+		//   1  2  3
+		//   4  5  6
+		//   7  8  9
 		if (ppos.x<0) {
 			if (ppos.z>q_y) {player_sector=1;}
 			else {
@@ -63,6 +57,7 @@ public class house : MonoBehaviour {
 		if (player_sector!=prev_sector) {
 			prev_sector=player_sector;
 			send=true;
+			print(player_sector);
 		}
 		if (prev_subsector!=player_subsector) {prev_subsector=player_subsector;send=true;}
 		if (send) {
@@ -70,8 +65,7 @@ public class house : MonoBehaviour {
 				GameObject g=transform.GetChild(i).gameObject;
 				if (!g.activeSelf) g.SetActive(true);
 				if (g.GetComponent<padik>()!=null) {
-					if (player_sector!=5) g.GetComponent<padik>().PadikOptimize(player_sector,player_subsector,false);
-					else g.GetComponent<padik>().PadikOptimize(player_sector,player_subsector,true);
+					g.GetComponent<padik>().PadikOptimize(player_sector,player_subsector,player_sector==5);
 				}
 		}
 	}

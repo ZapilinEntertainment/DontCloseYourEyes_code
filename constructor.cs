@@ -27,8 +27,64 @@ public static class constructor{
 	public static GameObject platform;
 	public static GameObject floor;
 	public static GameObject padik_door; //pddr
-		
 
+	public static GameObject CreateCourtyard_0 (string name,Vector3 pos,int xsize, int ysize, byte frs,byte open,int density) {
+		//fr=first row
+		int kf=1;
+		bool fwd_fr=(frs&8)==0,back_fr=(frs&4)==0,right_fr=(frs&2)==0,left_fr=(frs&1)==0;
+		GameObject cy=new GameObject(name);
+		if (fwd_fr||(!fwd_fr&&!right_fr&&!left_fr)) {
+			if (Random.value>0.5f) kf=-1; else kf=1;
+			CreateHouse_ResHigh (cy,xsize,ysize/8,new Vector3(0,0,ysize/8*7),Quaternion.Euler(0,180,0),1,4,density+kf*density/3);
+			if (Random.value>0.5f) kf=-1; else kf=1;
+			CreateHouse_ResHigh (cy,xsize/8,ysize/2,new Vector3(0,0,ysize/4),Quaternion.Euler(0,90,0),2,2,density+kf*density/3);
+			if (Random.value>0.5f) kf=-1; else kf=1;
+			CreateHouse_ResHigh (cy,xsize/8,ysize/2,new Vector3(xsize*7/8,0,ysize/4),Quaternion.Euler(0,-90,0),3,2,density+kf*density/3);
+			if (back_fr) {
+				if (Random.value>0.5f) kf=-1; else kf=1;
+				CreateHouse_ResHigh (cy,xsize,ysize/8,Vector3.zero,Quaternion.Euler(0,0,0),4,4,density+kf*density/3);
+			}
+			else {
+				if (Random.value>0.5f) kf=-1; else kf=1;
+				CreateHouse_ResHigh (cy,3*xsize/8,ysize/8,new Vector3(0,0,0),Quaternion.Euler(0,0,0),4,2,density+kf*density/3);
+			}
+		}
+		else {
+	
+	}
+		return (cy);
+	}
+
+	public static GameObject CreateHouse_ResHigh (GameObject courtyard,int xsize,int ysize,Vector3 pos, Quaternion rot, int number,byte padiks,int floors) {
+		bool left=true;
+		bool right =false;
+		GameObject h=new GameObject("house");
+		h.name="h"+number.ToString(); if (h.name.Length==2) h.name="h0"+number.ToString();
+		if (courtyard!=null) {h.transform.parent=courtyard.transform;h.transform.localPosition=pos;h.transform.localRotation=rot;}
+		int q_x=xsize/2;
+		int e_x=q_x/6; if (e_x<4) e_x=4;
+		q_x-=e_x/2;
+		int q_y=ysize; 
+		int e_y=(int)(Random.value*q_y/2+q_y/2);
+		if (e_y<4) e_y=4;
+		for (byte i=1;i<=padiks;i++) {
+			if (i==padiks) right=true;
+			constructor.CreatePadik(h,new Vector3((q_x*2+e_x)*(i-1),0,0),q_x,q_y,e_x,e_y,right,left,i,floors);
+			left=false;
+		}
+		house hsc=h.AddComponent<house>();
+		hsc.rsize_x=(q_x*2+e_x)*padiks;
+		return (h);
+	}
+
+	//--------------------CREATE SMALL HOUSE
+	public static GameObject CreateSmallHouse () 
+	{
+		GameObject myHouse=new GameObject("small house");
+		return (myHouse);
+	}
+
+	//--------------CREATE PADIK
 	public static GameObject CreatePadik (GameObject house,Vector3 pos, int q_x,int q_y,float e_x, float e_y,bool right_windows, bool left_windows,int number,int floors) 
 	{
 		if (e_y>q_y) e_y=q_y;
@@ -250,17 +306,25 @@ public static class constructor{
 			if (rooms_x/rooms_y>=4) rooms_x=rooms_y*4;
 			central_x=xsize-kitchen_x-rooms_x;
 		} else central_x=xsize-kitchen_x;
-		//сборка
+
+
+		//сборка комнат
 		byte i=0; 
 		float z=0;
-		float dvz=ysize-e_y;
-		if (dvz<0) dvz=0;	//ширина внутреннего дворика
+		float dvz=ysize-e_y;		if (dvz<0) dvz=0;	//ширина внутреннего дворика
 		string fwd=""; string back="";string right="";string left="";
 		string center_right=""; string center_left="";
+
 		//kitchen
-		if (fwd_open) fwd=WindowsDivide(kitchen_x); else fwd=WallsDivide(kitchen_x,false);
-		if (dvz>=kitchen_y&&dvz>=2) {left=WindowsDivide(kitchen_y);dvz-=kitchen_y;}
-		else {
+		if (fwd_open) fwd=WindowsDivide(kitchen_x); 
+						else fwd=WallsDivide(kitchen_x,false);
+		if (dvz>=kitchen_y&&dvz>=2) 
+		{
+			left=WindowsDivide(kitchen_y);
+			dvz-=kitchen_y;
+		}
+		else 
+		{
 			left=WindowsDivide(dvz)+WallsDivide(kitchen_y-dvz,false);
 			dvz=0;
 		}
@@ -281,9 +345,10 @@ public static class constructor{
 			center_right=right; 
 		}
 			else {
-			 ConstructRoom(quarteer,kitchen_x,kitchen_y,0,ysize-kitchen_y,"kitc",fwd,back,right,left);
-			CreateDoor(quarteer,new Vector3(kitchen_x,1.2f,ysize-kitchen_y+z/2.0f-0.5f),new Vector3(0,-90,0),z,true);
-			center_left=right; }
+			 ConstructRoom(quarteer,kitchen_x,kitchen_y,0,ysize-kitchen_y,"kitc",fwd,back,left,right);
+				CreateDoor(quarteer,new Vector3(kitchen_x,1.2f,ysize-kitchen_y+z/2.0f-0.5f),new Vector3(0,-90,0),z,true);
+				center_left=right; 
+		}
 		fwd="";back="";right="";
 
 		//toilet&bath
@@ -703,9 +768,7 @@ public static class constructor{
 
 	static GameObject ConstructRoom(GameObject quarteer,float size_x,float size_y,float xpos,float ypos,string nm,string fwd,string back,string right,string left) {
 		GameObject room=new GameObject(nm);
-		room.transform.parent=quarteer.transform;
-		room.transform.localPosition=new Vector3(xpos,0,ypos);
-		room.transform.localRotation=Quaternion.Euler(0,0,0);
+		AddObject(quarteer,room,new Vector3(xpos,0,ypos));
 		bool havehalf_x=false;bool havehalf_y=false;
 		if ((int)(size_x)%2!=0) havehalf_x=true;
 		if ((int)(size_y)%2!=0) havehalf_y=true;
@@ -795,9 +858,6 @@ public static class constructor{
 			j+=2;
 			c++;
 			}}
-		room_optimizer or=room.AddComponent<room_optimizer>();
-		or.xsize=size_x;
-		or.ysize=size_y;
 		return(room);
 	}
 		
@@ -901,6 +961,24 @@ public static class constructor{
 		return (x);
 	}
 
+	static void AddObject (GameObject parent,GameObject child,Vector3 relative_pos,Vector3 relative_rotation) 
+	{
+		child.transform.parent=parent.transform;
+		child.transform.localPosition=relative_pos;
+		child.transform.localRotation=Quaternion.Euler(relative_rotation);
+	}
+	static void AddObject (GameObject parent, GameObject child,Vector3 relative_pos) 
+	{
+		child.transform.parent=parent.transform;
+		child.transform.localPosition=relative_pos;
+		child.transform.localRotation=Quaternion.Euler(Vector3.zero);
+	}
+	static void AddObject (GameObject parent, GameObject child) 
+	{
+		child.transform.parent=parent.transform;
+		child.transform.localPosition=Vector3.zero;
+		child.transform.localRotation=Quaternion.Euler(Vector3.zero);
+	}
 
 
 

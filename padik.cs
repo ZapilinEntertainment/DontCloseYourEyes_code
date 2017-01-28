@@ -22,7 +22,7 @@ public class padik : MonoBehaviour {
 			BroadcastMessage("WindowState",(byte)(1),SendMessageOptions.DontRequireReceiver);
 			BroadcastMessage("Optimize",player_sector,SendMessageOptions.DontRequireReceiver);
 		}
-			else {
+		else {
 			dynamic_optimization=false;
 			if (inside) {gameObject.SetActive(false);return;}
 			else {

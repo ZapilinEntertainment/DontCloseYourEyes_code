@@ -55,10 +55,14 @@ public class menu : MonoBehaviour {
 		Global.str_triangle2m=Resources.Load<GameObject>("structures/tr2m");
 		Global.str_plate53degree=Resources.Load<GameObject>("structures/pl53");
 		Global.cam=cam;
+
+		//constructor.CreateCourtyard_0("court0",new Vector3(0,0,0),16,16,15,((byte)(Random.value*15)),16);
 	}
 
 	void Update () {
 		Global.ppos=Global.player.transform.position;
+
+		//day-night cycle
 		if (!sun) return;
 		if (grow) {
 			Global.daytime+=Time.deltaTime*dayspeed/1440;
@@ -67,6 +71,7 @@ public class menu : MonoBehaviour {
 				//skbox.SetFloat("_Exposure",(1-daytime)*1+1);
 				skbox.SetFloat("_SunSize",Global.daytime*0.01f+0.04f);
 			}
+
 			}
 		else {
 			Global.daytime-=Time.deltaTime*dayspeed/1440;
@@ -92,7 +97,7 @@ public class menu : MonoBehaviour {
 		if (sun.gameObject.activeSelf) {
 			if (grow) sun.transform.rotation=Quaternion.Euler(Global.daytime*90,0,0);
 			else sun.transform.rotation=Quaternion.Euler((1-Global.daytime)*90+90,0,0);
-			float intens=Global.daytime*2;
+			float intens=Global.daytime;
 			sun.intensity=intens;
 			if (intens<=0&&!day) {sun.gameObject.SetActive(false);}
 			float x=sun_radius*Mathf.Cos(Global.daytime*90*Mathf.Deg2Rad);
